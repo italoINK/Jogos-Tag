@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pokémon Fogo Vermelho</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      overflow: hidden;
+    }
+    #game-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-container"></div>
+
+  <script>
+    // Configurações do EmulatorJS
+    window.EJS_player = '#game-container';
+    window.EJS_core = 'gba';
+    window.EJS_gameName = 'Pokemon FireRed';
+    window.EJS_gameUrl = 'https://raw.githubusercontent.com/italoINK/Jogos-Tag/refs/heads/main/Fogo%20Vermelho%20ain%20papai%20para%20(BR-USA)%20(Breno)%20(T1.1)%20(www.romsportugues.com).gba';
+    window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+    window.EJS_startOnLoaded = true;
+    window.EJS_color = '#e53935'; // Cor de destaque temática vermelha
+  </script>
+  <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
+
+</body>
+</html>
