@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1b5e20">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>CalcEstoque Pro - LibreOffice Style</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Liberation Sans', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #e9ecef;
+      color: #212529;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      font-size: 13px;
+    }
+
+    /* Topo estilo LibreOffice Calc */
+    .title-bar {
+      background: linear-gradient(90deg, #185c37, #107c41);
+      color: #fff;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .title-actions button {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+
+    /* Barra de Fórmulas */
+    .formula-bar {
+      background: #f8f9fa;
+      border-bottom: 1px solid #adb5bd;
+      display: flex;
+      align-items: center;
+      padding: 4px 8px;
+      gap: 6px;
+    }
+
+    .cell-ref {
+      background: #fff;
+      border: 1px solid #ced4da;
+      padding: 3px 8px;
+      width: 55px;
+      text-align: center;
+      font-weight: bold;
+      color: #495057;
+      font-size: 12px;
+    }
+
+    .fx-icon {
+      font-style: italic;
+      font-weight: bold;
+      color: #185c37;
+      padding: 0 4px;
+    }
+
+    .formula-input {
+      flex: 1;
+      background: #fff;
+      border: 1px solid #ced4da;
+      padding: 3px 8px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #212529;
+      white-space: nowrap;
+      overflow-x: auto;
+    }
+
+    /* Área principal das abas */
+    .workspace {
+      flex: 1;
+      overflow-y: auto;
+      background: #ffffff;
+      position: relative;
+      padding-bottom: 60px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Painel de Inserção Rápida */
+    .quick-form {
+      background: #f1f3f5;
+      border-bottom: 2px solid #adb5bd;
+      padding: 10px;
+    }
+
+    .quick-form-title {
+      font-weight: bold;
+      color: #185c37;
+      margin-bottom: 8px;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 7px 8px;
+      border: 1px solid #adb5bd;
+      border-radius: 2px;
+      font-size: 13px;
+      background: #fff;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid #107c41;
+      border-color: transparent;
+    }
+
+    .btn-calc {
+      background: #107c41;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      font-weight: bold;
+      border-radius: 2px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 13px;
+    }
+
+    .btn-calc:active {
+      background: #185c37;
+    }
+
+    /* Grade Estilo Planilha LibreOffice */
+    .sheet-container {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table.calc-grid {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+      min-width: 360px;
+    }
+
+    table.calc-grid th.col-header {
+      background: #e9ecef;
+      border: 1px solid #adb5bd;
+      color: #495057;
+      font-weight: bold;
+      text-align: center;
+      padding: 4px;
+      font-size: 11px;
+      user-select: none;
+    }
+
+    table.calc-grid td.row-header {
+      background: #e9ecef;
+      border: 1px solid #adb5bd;
+      color: #495057;
+      font-weight: bold;
+      text-align: center;
+      width: 28px;
+      font-size: 11px;
+      user-select: none;
+    }
+
+    table.calc-grid tr.sheet-head td {
+      background: #dee2e6;
+      font-weight: bold;
+      color: #212529;
+      border: 1px solid #adb5bd;
+      padding: 6px 4px;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    table.calc-grid td {
+      border: 1px solid #ced4da;
+      padding: 6px 5px;
+      font-size: 12px;
+      vertical-align: middle;
+    }
+
+    table.calc-grid tr:hover td:not(.row-header) {
+      background-color: #f8f9fa;
+    }
+
+    td.selected-cell {
+      outline: 2px solid #107c41 !important;
+      background-color: #e8f5e9 !important;
+    }
+
+    .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .profit-pos {
+      color: #107c41;
+      font-weight: bold;
+    }
+
+    .cost-val {
+      color: #c92a2a;
+    }
+
+    /* Botões dentro da célula */
+    .cell-actions {
+      display: flex;
+      gap: 3px;
+      justify-content: center;
+      flex-wrap: nowrap;
+    }
+
+    .btn-mini {
+      border: 1px solid #adb5bd;
+      background: #f8f9fa;
+      padding: 3px 6px;
+      font-size: 11px;
+      cursor: pointer;
+      border-radius: 2px;
+      font-weight: bold;
+    }
+
+    .btn-mini.sell {
+      background: #d3f9d8;
+      border-color: #8ce99a;
+      color: #1b5e20;
+    }
+
+    .btn-mini.edit {
+      background: #e7f5ff;
+      border-color: #74c0fc;
+      color: #1864ab;
+    }
+
+    .btn-mini.del {
+      background: #ffe3e3;
+      border-color: #ffa8a8;
+      color: #c92a2a;
+    }
+
+    /* Painéis de Caixa (Aba 3) */
+    .cash-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 10px;
+      background: #f1f3f5;
+      border-bottom: 2px solid #adb5bd;
+    }
+
+    .cash-card {
+      background: #fff;
+      border: 1px solid #adb5bd;
+      border-left: 5px solid #107c41;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cash-card.repor {
+      border-left-color: #e67700;
+    }
+
+    .cash-card.lucro {
+      border-left-color: #2b8a3e;
+      background: #ebfbee;
+    }
+
+    .cash-card-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #495057;
+      font-weight: bold;
+    }
+
+    .cash-card-desc {
+      font-size: 11px;
+      color: #868e96;
+      margin-top: 2px;
+    }
+
+    .cash-card-val {
+      font-size: 18px;
+      font-weight: bold;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Abas inferiores estilo LibreOffice Calc */
+    .sheet-tabs-bar {
+      background: #dee2e6;
+      border-top: 1px solid #adb5bd;
+      display: flex;
+      height: 44px;
+      align-items: stretch;
+      padding-left: 6px;
+      z-index: 10;
+    }
+
+    .sheet-tab {
+      background: #ced4da;
+      border: 1px solid #adb5bd;
+      border-bottom: none;
+      margin-right: 4px;
+      margin-top: 4px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: bold;
+      color: #495057;
+      cursor: pointer;
+      border-radius: 4px 4px 0 0;
+      flex: 1;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .sheet-tab.active {
+      background: #ffffff;
+      color: #107c41;
+      border-top: 3px solid #107c41;
+      margin-top: 0;
+    }
+
+    .status-bar {
+      background: #e9ecef;
+      border-top: 1px solid #ced4da;
+      padding: 3px 10px;
+      font-size: 11px;
+      color: #495057;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra de Título -->
+  <div class="title-bar">
+    <div>📊 CalcEstoque.ods — LibreOffice Calc</div>
+    <div class="title-actions">
+      <button onclick="exportBackup()">💾 Backup</button>
+      <button onclick="resetAll()">🗑️ Zerar</button>
+    </div>
+  </div>
+
+  <!-- Barra de Fórmulas -->
+  <div class="formula-bar">
+    <div class="cell-ref" id="cellRef">A1</div>
+    <div class="fx-icon">f(x)</div>
+    <div class="formula-input" id="formulaDisplay">=SELECIONE_UMA_CELULA()</div>
+  </div>
+
+  <!-- Área de Trabalho -->
+  <div class="workspace">
+
+    <!-- ABA 1: ESTOQUE -->
+    <div class="tab-content active" id="tab-estoque">
+      <div class="quick-form">
+        <div class="quick-form-title" id="formTitle">➕ Adicionar / Editar Item no Estoque</div>
+        <input type="hidden" id="editItemId" value="">
+        <div class="form-grid">
+          <input type="text" id="itemName" placeholder="Nome do Produto (ex: Camiseta)">
+          <input type="number" id="itemQty" placeholder="Qtd" inputmode="numeric">
+        </div>
+        <div class="form-grid-3">
+          <input type="number" id="itemCost" step="0.01" placeholder="Custo (ex: 11.90)" inputmode="decimal">
+          <input type="number" id="itemPrice" step="0.01" placeholder="Venda (ex: 15.00)" inputmode="decimal">
+          <button class="btn-calc" onclick="saveItem()" id="btnSaveItem">Salvar</button>
+        </div>
+      </div>
+
+      <div class="sheet-container">
+        <table class="calc-grid">
+          <thead>
+            <tr>
+              <th class="col-header"></th>
+              <th class="col-header">A</th>
+              <th class="col-header">B</th>
+              <th class="col-header">C</th>
+              <th class="col-header">D</th>
+              <th class="col-header">E</th>
+              <th class="col-header">F</th>
+            </tr>
+            <tr class="sheet-head">
+              <td class="row-header">1</td>
+              <td>Produto</td>
+              <td>Qtd</td>
+              <td>Custo</td>
+              <td>Venda</td>
+              <td>Lucro Un.</td>
+              <td>Ações</td>
+            </tr>
+          </thead>
+          <tbody id="estoqueBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ABA 2: SAÍDAS / EDIÇÃO -->
+    <div class="tab-content" id="tab-saidas">
+      <div class="quick-form">
+        <div class="quick-form-title">📤 Registrar Saída de Produto (Baixa no Estoque)</div>
+        <div class="form-grid">
+          <select id="saidaSelect" onchange="updateSaidaPreview()"></select>
+          <input type="number" id="saidaQty" value="1" min="1" placeholder="Qtd" inputmode="numeric" oninput="updateSaidaPreview()">
+        </div>
+        <div style="font-size: 12px; margin-bottom: 6px; color: #343a40;" id="saidaPreview">
+          Selecione um item para calcular a saída...
+        </div>
+        <button class="btn-calc" onclick="registrarSaida()">Confirmar Saída e Enviar p/ Caixa</button>
+      </div>
+
+      <div class="sheet-container">
+        <table class="calc-grid">
+          <thead>
+            <tr>
+              <th class="col-header"></th>
+              <th class="col-header">A</th>
+              <th class="col-header">B</th>
+              <th class="col-header">C</th>
+              <th class="col-header">D</th>
+              <th class="col-header">E</th>
+              <th class="col-header">F</th>
+            </tr>
+            <tr class="sheet-head">
+              <td class="row-header">1</td>
+              <td>Hora</td>
+              <td>Produto</td>
+              <td>Qtd</td>
+              <td>Entrou (R$)</td>
+              <td>Lucro (R$)</td>
+              <td>Desfazer</td>
+            </tr>
+          </thead>
+          <tbody id="saidasBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ABA 3: CAIXA E LUCRO -->
+    <div class="tab-content" id="tab-caixa">
+      <div class="cash-cards">
+        <div class="cash-card" onclick="selectFormula('B2', '=SOMA(VENDAS_BRUTAS)')">
+          <div>
+            <div class="cash-card-title">1. Saldo Total em Caixa (Entrou)</div>
+            <div class="cash-card-desc">Valor bruto de todas as vendas realizadas</div>
+          </div>
+          <div class="cash-card-val" id="caixaTotal">R$ 0,00</div>
+        </div>
+
+        <div class="cash-card repor" onclick="selectFormula('B3', '=SOMA(CUSTO_PRODUTOS_VENDIDOS)')">
+          <div>
+            <div class="cash-card-title">2. Guardar p/ Repor Estoque (Custo)</div>
+            <div class="cash-card-desc">Dinheiro reservado para recomprar mercadoria</div>
+          </div>
+          <div class="cash-card-val cost-val" id="caixaRepor">R$ 0,00</div>
+        </div>
+
+        <div class="cash-card lucro" onclick="selectFormula('B4', '=B2-B3 (LUCRO_LIQUIDO_REAL)')">
+          <div>
+            <div class="cash-card-title">3. Seu Lucro Líquido Real</div>
+            <div class="cash-card-desc">O que sobra livre após separar a reposição</div>
+          </div>
+          <div class="cash-card-val profit-pos" id="caixaLucro">R$ 0,00</div>
+        </div>
+      </div>
+
+      <div class="sheet-container">
+        <table class="calc-grid">
+          <thead>
+            <tr>
+              <th class="col-header"></th>
+              <th class="col-header">A</th>
+              <th class="col-header">B</th>
+              <th class="col-header">C</th>
+            </tr>
+            <tr class="sheet-head">
+              <td class="row-header">1</td>
+              <td>Descrição Financeira da Loja</td>
+              <td>Valor (R$)</td>
+              <td>Fórmula / Regra</td>
+            </tr>
+          </thead>
+          <tbody id="caixaSheetBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Barra de Status -->
+  <div class="status-bar">
+    <span id="statusText">Pronto | Salvo automaticamente no aparelho</span>
+    <span id="statusSummary">Itens: 0</span>
+  </div>
+
+  <!-- Abas Inferiores Estilo LibreOffice -->
+  <div class="sheet-tabs-bar">
+    <div class="sheet-tab active" onclick="switchTab('estoque', this)">1. Estoque</div>
+    <div class="sheet-tab" onclick="switchTab('saidas', this)">2. Saídas</div>
+    <div class="sheet-tab" onclick="switchTab('caixa', this)">3. Caixa & Lucro</div>
+  </div>
+
+  <script>
+    // Dados iniciais com o exemplo de R$ 11,90 e R$ 15,00
+    const defaultData = {
+      items: [
+        { id: 1, name: "Produto Exemplo", qty: 10, cost: 11.90, price: 15.00 }
+      ],
+      sales: []
+    };
+
+    let db = JSON.parse(localStorage.getItem('calcEstoqueDB')) || defaultData;
+
+    function saveData() {
+      localStorage.setItem('calcEstoqueDB', JSON.stringify(db));
+      renderAll();
+    }
+
+    function formatBRL(val) {
+      return Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function selectFormula(ref, formula, tdElement) {
+      document.getElementById('cellRef').innerText = ref;
+      document.getElementById('formulaDisplay').innerText = formula;
+      document.querySelectorAll('td.selected-cell').forEach(el => el.classList.remove('selected-cell'));
+      if (tdElement) tdElement.classList.add('selected-cell');
+    }
+
+    function switchTab(tabName, el) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.sheet-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+      el.classList.add('active');
+      renderAll();
+    }
+
+    // Adicionar ou Editar Item
+    function saveItem() {
+      const editId = document.getElementById('editItemId').value;
+      const name = document.getElementById('itemName').value.trim();
+      const qty = parseInt(document.getElementById('itemQty').value);
+      const cost = parseFloat(String(document.getElementById('itemCost').value).replace(',', '.'));
+      const price = parseFloat(String(document.getElementById('itemPrice').value).replace(',', '.'));
+
+      if (!name || isNaN(qty) || isNaN(cost) || isNaN(price)) {
+        alert("Preencha nome, quantidade, custo e valor de venda corretamente!");
+        return;
+      }
+
+      if (editId) {
+        const idx = db.items.findIndex(i => i.id == editId);
+        if (idx > -1) {
+          db.items[idx] = { id: Number(editId), name, qty, cost, price };
+        }
+      } else {
+        // Se já existir item com mesmo nome, soma ou atualiza
+        const existing = db.items.find(i => i.name.toLowerCase() === name.toLowerCase());
+        if (existing) {
+          existing.qty += qty;
+          existing.cost = cost;
+          existing.price = price;
+        } else {
+          db.items.push({ id: Date.now(), name, qty, cost, price });
+        }
+      }
+
+      clearForm();
+      saveData();
+    }
+
+    function editItem(id) {
+      const item = db.items.find(i => i.id === id);
+      if (!item) return;
+      document.getElementById('editItemId').value = item.id;
+      document.getElementById('itemName').value = item.name;
+      document.getElementById('itemQty').value = item.qty;
+      document.getElementById('itemCost').value = item.cost;
+      document.getElementById('itemPrice').value = item.price;
+      document.getElementById('formTitle').innerText = "✏️ Editando: " + item.name;
+      document.getElementById('btnSaveItem').innerText = "Atualizar";
+      window.scrollTo(0, 0);
+    }
+
+    function clearForm() {
+      document.getElementById('editItemId').value = "";
+      document.getElementById('itemName').value = "";
+      document.getElementById('itemQty').value = "";
+      document.getElementById('itemCost').value = "";
+      document.getElementById('itemPrice').value = "";
+      document.getElementById('formTitle').innerText = "➕ Adicionar / Editar Item no Estoque";
+      document.getElementById('btnSaveItem').innerText = "Salvar";
+    }
+
+    function changeQty(id, delta) {
+      const item = db.items.find(i => i.id === id);
+      if (!item) return;
+      if (item.qty + delta < 0) {
+        alert("O estoque não pode ficar negativo!");
+        return;
+      }
+      item.qty += delta;
+      saveData();
+    }
+
+    function quickSellOne(id) {
+      const item = db.items.find(i => i.id === id);
+      if (!item || item.qty <= 0) {
+        alert("Produto sem estoque disponível!");
+        return;
+      }
+      item.qty -= 1;
+      db.sales.unshift({
+        id: Date.now(),
+        itemId: item.id,
+        name: item.name,
+        qty: 1,
+        unitCost: item.cost,
+        unitPrice: item.price,
+        time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+      });
+      saveData();
+    }
+
+    function deleteItem(id) {
+      if (confirm("Deseja remover este produto da planilha de estoque?")) {
+        db.items = db.items.filter(i => i.id !== id);
+        saveData();
+      }
+    }
+
+    // Aba 2: Registrar saída
+    function updateSaidaPreview() {
+      const select = document.getElementById('saidaSelect');
+      const qty = parseInt(document.getElementById('saidaQty').value) || 0;
+      const preview = document.getElementById('saidaPreview');
+
+      if (!select.value) {
+        preview.innerText = "Cadastre produtos na Aba 1 primeiro.";
+        return;
+      }
+
+      const item = db.items.find(i => i.id == select.value);
+      if (!item) return;
+
+      const totalVenda = item.price * qty;
+      const totalCusto = item.cost * qty;
+      const totalLucro = totalVenda - totalCusto;
+
+      preview.innerHTML = `Disponível: <b>${item.qty} un</b> | Vai entrar: <b>${formatBRL(totalVenda)}</b> | Guardar Custo: <span class="cost-val">${formatBRL(totalCusto)}</span> | Lucro: <span class="profit-pos">${formatBRL(totalLucro)}</span>`;
+    }
+
+    function registrarSaida() {
+      const select = document.getElementById('saidaSelect');
+      const qty = parseInt(document.getElementById('saidaQty').value);
+      const item = db.items.find(i => i.id == select.value);
+
+      if (!item || isNaN(qty) || qty <= 0) {
+        alert("Informe uma quantidade válida!");
+        return;
+      }
+
+      if (qty > item.qty) {
+        alert(`Estoque insuficiente! Você só tem ${item.qty} unidades de ${item.name}.`);
+        return;
+      }
+
+      item.
